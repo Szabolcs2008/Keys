@@ -51,9 +51,9 @@ with open("config.json", "r") as f:
     config = json.load(f)
     if "ignored-keys" not in config or "sounds" not in config or "keys" not in config:
         with open("config.json.old", "w") as f2:
-            f2.write(f.read())
-        with open("config.json", "w") as f:
-            json.dump(data, f, indent=2)
+            json.dump(config, f2, indent=2)
+        with open("config.json", "w") as newF:
+            json.dump(data, newF, indent=2)
         tkinter.messagebox.showerror(title,
                                      "Outdated or damaged configuration. Created a backup and regenerated config.\nThe program will exit now.")
         os._exit(0)
