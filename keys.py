@@ -10,7 +10,7 @@ import customtkinter as ctk
 import tkinter
 import tkinter.messagebox
 
-title = f"Keys 2.0.1"
+title = f"Keys 2.1.0"
 
 customtkinter.set_default_color_theme("dark-blue")
 customtkinter.set_appearance_mode("dark")
