@@ -31,7 +31,8 @@ data = {
         "default": "examplesound1",
         "Key.space": "examplesound1",
         "Key.enter": ["examplesound1", "examplesound2"]
-    }
+    },
+    "ignored-keys": ["Key.esc"]
 }
 
 volume = 1
@@ -45,8 +46,17 @@ if not os.path.exists("config.json"):
     with open("config.json", "w") as f:
         json.dump(data, f, indent=2)
 
+
 with open("config.json", "r") as f:
     config = json.load(f)
+    if "ignored-keys" not in config or "sounds" not in config or "keys" not in config:
+        with open("config.json.old", "w") as f2:
+            f2.write(f.read())
+        with open("config.json", "w") as f:
+            json.dump(data, f, indent=2)
+        tkinter.messagebox.showerror(title,
+                                     "Outdated or damaged configuration. Created a backup and regenerated config.\nThe program will exit now.")
+        os._exit(0)
 
 
 def onKeyPress(key):
@@ -57,21 +67,23 @@ def onKeyPress(key):
         elif str(key)[0] == '"':
             key = str(key).replace('"', "")
         if str(key) not in pressed_keys:
-            if str(key) in config["keys"]:
-                if type(config["keys"][str(key)]) == list:
-                    pressed_keys[str(key)] = random.choice(config["keys"][str(key)])
+            if str(key) not in config["ignored-keys"]:
+                if str(key) in config["keys"]:
+                    if type(config["keys"][str(key)]) == list:
+                        pressed_keys[str(key)] = random.choice(config["keys"][str(key)])
+                    else:
+                        if config["keys"][str(key)] is not None:
+                            pressed_keys[str(key)] = config["keys"][str(key)]
                 else:
-                    pressed_keys[str(key)] = config["keys"][str(key)]
-            else:
-                if type(config["keys"]["default"]) == list:
-                    pressed_keys[str(key)] = random.choice(config["keys"]["default"])
-                else:
-                    pressed_keys[str(key)] = config["keys"]["default"]
-            sound = config["sounds"][pressed_keys[str(key)]]["press-sound"]
-            if sound is not None:
-                s = pygame.mixer.Sound(sound)
-                s.set_volume(volume)
-                s.play()
+                    if type(config["keys"]["default"]) == list:
+                        pressed_keys[str(key)] = random.choice(config["keys"]["default"])
+                    else:
+                        pressed_keys[str(key)] = config["keys"]["default"]
+                sound = config["sounds"][pressed_keys[str(key)]]["press-sound"]
+                if sound is not None:
+                    s = pygame.mixer.Sound(sound)
+                    s.set_volume(volume)
+                    s.play()
 
     except Exception as e:
         err = sys.exc_info()
